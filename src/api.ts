@@ -29,6 +29,17 @@ export const API = {
 
     Mess: 'api/mess',
 
-    Search: 'api/search{?query}'
+    Search: 'api/search{?query}',
 
+    MoodleLogin: 'moodleapi/login/token.php{?username,password,service}',
+    MoodleFormat: 'json',
+
+    MoodleUserFun: 'moodleapi/webservice/rest/server.php{?wstoken,wsfunction,moodlewsrestformat,userid}',
+    MoodleFunCourses: 'core_enrol_get_users_courses',
+
+    MoodleCourseFun: 'moodleapi/webservice/rest/server.php{?wstoken,wsfunction,moodlewsrestformat,courseid}',
+    MoodleFunCourse: 'core_course_get_contents',
+
+    MoodleInfo: 'moodleapi/webservice/rest/server.php{?wstoken,wsfunction,moodlewsrestformat}',
+    MoodleFunInfo: 'core_webservice_get_site_info',
 };

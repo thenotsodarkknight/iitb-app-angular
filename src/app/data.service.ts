@@ -39,6 +39,8 @@ export class DataService {
   /* Constants */
   public LOGIN_REDIR = 'login_redir';
   public LS_USER = 'user_profile';
+  public LS_MOODLE_TOKEN = 'moodle_token';
+  public LS_MOODLE_INFO = 'moodle_info';
 
   constructor(
     private http: HttpClient,

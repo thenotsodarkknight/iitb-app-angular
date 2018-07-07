@@ -55,6 +55,7 @@ import { SettingsComponent } from './settings/settings.component';
 import { AboutComponent } from './about/about.component';
 import { XunkCalendarComponent } from './xunk-calendar/xunk-calendar.component';
 import { DesktopSplitComponent } from './desktop-split/desktop-split.component';
+import { MoodleComponent } from './moodle/moodle.component';
 
 @NgModule({
   declarations: [
@@ -85,7 +86,8 @@ import { DesktopSplitComponent } from './desktop-split/desktop-split.component';
     SettingsComponent,
     AboutComponent,
     XunkCalendarComponent,
-    DesktopSplitComponent
+    DesktopSplitComponent,
+    MoodleComponent
   ],
   imports: [
     BrowserModule,
@@ -111,6 +113,7 @@ import { DesktopSplitComponent } from './desktop-split/desktop-split.component';
       { path: 'explore', component: ExploreComponent, data: { state: 'base' } },
       { path: 'mess', component: MessComponent, data: { state: 'base' } },
       { path: 'map', component: MapComponent, data: { state: 'base' } },
+      { path: 'moodle', component: MoodleComponent, data: { state: 'base' } },
       { path: 'quick-links', component: QuickLinksComponent, data: { state: 'base' } },
       { path: 'settings', component: SettingsComponent, data: { state: 'base' } },
       { path: 'about', component: AboutComponent, data: { state: 'overlay' } },

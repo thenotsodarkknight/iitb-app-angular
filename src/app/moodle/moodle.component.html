@@ -1,0 +1,39 @@
+<div class="main">
+  <div *ngIf="!token">
+    <mat-form-field>
+      <input matInput
+              name="user" [(ngModel)]="usernameInput" placeholder="LDAP ID">
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+      <input matInput type="password"
+              name="pass" [(ngModel)]="passwordInput" placeholder="Password">
+    </mat-form-field>
+    <br>
+    <button mat-raised-button color="primary" (click)="login()">LOGIN</button>
+  </div>
+
+  <div *ngIf="token && !selCourse" class="course-list">
+    <mat-nav-list>
+      <a *ngFor="let course of courses"
+         (click)="openCourse(course)"
+         mat-list-item>
+          {{ course.shortname}} {{ course.fullname }}
+      </a>
+    </mat-nav-list>
+  </div>
+
+  <div *ngIf="token && selCourse">
+    <div *ngFor="let section of selCourse" class="section">
+      <div class="rl-header sm">{{ section.name }}</div>
+      <mat-nav-list>
+        <ng-container *ngFor="let module of section.modules">
+          <a [href]="module.contents ? module.contents[0].fileurl : null"
+              mat-list-item target="_blank">
+            <img *ngIf="module.modicon" [src]="module.modicon"> &nbsp; {{ module.name }}
+          </a>
+        </ng-container>
+      </mat-nav-list>
+    </div>
+  </div>
+</div>
