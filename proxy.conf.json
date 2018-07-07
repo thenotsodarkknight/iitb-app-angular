@@ -1,12 +1,23 @@
 {
     "/api/**": {
       "target": {
-          "host": "temp-iitb.radialapps.com",
+          "host": "api.insti.app",
           "protocol": "https:",
           "port": 443
         },
       "secure": false,
       "changeOrigin": true,
       "logLevel": "info"
+    },
+    "/moodleapi/**": {
+      "target": {
+          "host": "moodle.iitb.ac.in",
+          "protocol": "https:",
+          "port": 443
+        },
+      "secure": false,
+      "changeOrigin": true,
+      "logLevel": "info",
+      "pathRewrite": {"^/moodleapi" : ""}
     }
 }
