@@ -410,9 +410,12 @@ export class DataService {
 
     /* Make a notification */
     const title = notification.actor.name;
-    const options: NotificationOptions = {
+    const options = {
       body: notification.verb,
       icon: '/assets/logo-sq.png',
+      data: {
+        url: '/event/' + notification.actor.str_id + '?from-notify=' + notification.id.toString(),
+      }
     };
     this.swRegistration.showNotification(title, options);
 
@@ -432,7 +435,8 @@ export class DataService {
     this.FireGET<INotification[]>(API.Notifications).subscribe(result => {
       /* Initialize */
       if (!this.notifications) {
-        this.notifications = [];
+        this.notifications = result;
+        return;
       }
 
       const existing = this.notifications.map(m => m.id);

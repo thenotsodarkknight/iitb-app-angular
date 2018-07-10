@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit, HostListener } from '@
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Title } from '@angular/platform-browser';
 import { DataService } from './data.service';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Helpers } from './helpers';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SwUpdate } from '@angular/service-worker';
@@ -34,6 +34,7 @@ export class AppComponent implements OnDestroy, OnInit {
     public snackBar: MatSnackBar,
     private swUpdate: SwUpdate,
     private bottomSheet: MatBottomSheet,
+    public activatedRoute: ActivatedRoute,
   ) {
     this.mobileQuery = media.matchMedia('(max-width: 960px)');
     this._mobileQueryListener = () => {
@@ -41,6 +42,18 @@ export class AppComponent implements OnDestroy, OnInit {
       changeDetectorRef.detectChanges();
     };
     this.mobileQuery.addListener(this._mobileQueryListener);
+
+    /* If opened from notification */
+    this.activatedRoute.queryParams.subscribe(params => {
+      if ('from-notify' in params) {
+        const from_notify = params['from-notify'];
+        /* Mark as read if opened from notification */
+        const sub = this.dataService.loggedInObservable.subscribe((status) => {
+          this.dataService.FireGET(API.NotificationRead, { id: from_notify }).subscribe();
+          sub.unsubscribe();
+        });
+      }
+    });
   }
 
   private toggleSidebar() {
@@ -138,8 +151,13 @@ export class AppComponent implements OnDestroy, OnInit {
 
   /** Setup service worker notifications */
   setupNotifications() {
+    /* Initialize service worker for notifications */
     if ('serviceWorker' in navigator ) {
       navigator.serviceWorker.getRegistrations().then((registrations) => {
+        /* Check if we have something */
+        if (!registrations || registrations.length === 0) { return; }
+
+        /* Get the first registration */
         const registration: ServiceWorkerRegistration = registrations[0];
         Notification.requestPermission().then((permission) => {
           if (permission !== 'denied') {
