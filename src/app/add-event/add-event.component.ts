@@ -41,7 +41,7 @@ export class AddEventComponent implements OnInit {
   public tagCategoryList: IUserTagCategory[];
 
   /* Fuse config */
-  public fuse_options = {
+  public fuse_options: Fuse.FuseOptions<ILocation> = {
     shouldSort: true,
     threshold: 0.3,
     tokenize: true,
@@ -145,7 +145,7 @@ export class AddEventComponent implements OnInit {
         this.initializeBodiesExisting();
         this.sortBodies();
 
-      }, (error) => {
+      }, () => {
         alert('Event not found!');
         this.dataService.navigateBack();
       });

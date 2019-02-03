@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable ,  Subject, noop } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpRequest, HttpEventType } from '@angular/common/http';
 import { IEnumContainer, IUserProfile, ILocation, IEvent, IBody, INewsEntry, INotification } from './interfaces';
 import { Router } from '@angular/router';
 import { environment } from '../environments/environment';
@@ -140,27 +140,19 @@ export class DataService {
 
   /** Uploads a static image to the server */
   UploadImage(image: File): Observable<any> {
+    /* Construct upload request */
+    const formData = new FormData();
+    formData.append('picture', image);
+    const uploadReq = new HttpRequest('POST', API.PostImage, formData);
+
+    /* Make upload request and return */
     return Observable.create(observer => {
-      this.GetBase64(image).subscribe(result => {
-        return this.FirePOST(API.PostImage, {picture: result}).subscribe(httpresult => {
-          observer.next(httpresult);
+      this.http.request(uploadReq).subscribe(event => {
+        if (event.type === HttpEventType.Response) {
+          observer.next(event.body);
           observer.complete();
-        }, (error) => observer.error(error));
+        }
       }, (error) => observer.error(error));
-    });
-  }
-
-  /** Returns an observable with the base64 representaion of a file */
-  GetBase64(file: File): Observable<string> {
-    return Observable.create(observer => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-
-      reader.onload = (() => {
-        observer.next(reader.result);
-        observer.complete();
-      });
-
     });
   }
 
@@ -215,7 +207,7 @@ export class DataService {
     return Observable.create(observer => {
       if (!this._currentUser) {
         /* Try to get from localStorage */
-        if (localStorage.getItem(this.LS_USER) !== null) {
+        if (!this.isSandbox && localStorage.getItem(this.LS_USER) !== null) {
           const user = JSON.parse(localStorage.getItem(this.LS_USER));
           this.loginUser(observer, user, false);
           this.updateUser();
@@ -224,7 +216,7 @@ export class DataService {
 
         /* Fire a get */
         this.FireGET<any>(API.LoggedInUser).subscribe(result => {
-          this.loginUser(observer, result.profile, true);
+          this.loginUser(observer, result.profile, !this.isSandbox);
         }, (error) => {
           observer.error(error);
         });
@@ -236,6 +228,11 @@ export class DataService {
     });
   }
 
+  /** Set the local storage profile to argument */
+  setLocalStorageUser(profile: IUserProfile) {
+    localStorage.setItem(this.LS_USER, JSON.stringify(profile));
+  }
+
   /** Helper to log in the user with the given user object */
   loginUser(observer: any, profile: IUserProfile, setLocal: Boolean) {
     this._loggedIn = true;
@@ -243,8 +240,7 @@ export class DataService {
 
     /* Set local storage */
     if (setLocal) {
-      localStorage.setItem(this.LS_USER, JSON.stringify(profile));
-      console.log(this._currentUser.name + ' is logged in');
+      this.setLocalStorageUser(profile);
     }
 
     observer.next(this._currentUser);
@@ -253,13 +249,25 @@ export class DataService {
   }
 
   /** Updates the current user profile */
-  updateUser() {
+  updateUser(profile: IUserProfile = null) {
     if (!this._loggedIn) { return; }
+
+    /* Helper function to update user */
+    const update = (u: IUserProfile) => {
+      this._currentUser = u;
+      this.setLocalStorageUser(this._currentUser);
+      this._loggedInSubject.next(true);
+    };
+
+    /* Check if profile was passed as an argument */
+    if (profile !== null) {
+      update(profile);
+      return;
+    }
 
     /* Update the profile */
     this.FireGET<any>(API.LoggedInUser).subscribe(result => {
-      this._currentUser = result.profile;
-      this._loggedInSubject.next(true);
+      update(result.profile);
     }, (error) => {
       if (error.status === 401) {
         alert('Your session has expired');

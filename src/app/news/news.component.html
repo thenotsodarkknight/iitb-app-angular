@@ -14,8 +14,8 @@
   <ng-container *ngFor="let item of feed">
 
     <div class="feed-card" (click)="openLink(item.link, $event)">
-      <div class="feed-title">{{item.title}}</div>
-      <div class="feed-subtitle">{{item.body.name}} | {{item.published | date:"dd-MMM-yyyy HH:mm"}}</div>
+      <div class="feed-title">{{ item.title }}</div>
+      <div class="feed-subtitle">{{ item.body.name }} | {{ item.published | date:"dd-MMM-yyyy HH:mm" }}</div>
       <markdown [data]="dataService.processMDHTML(item.content)" class="markdown"></markdown>
 
       <mat-menu #reactMenu="matMenu" yPosition="below" xPosition="before">
@@ -41,7 +41,7 @@
 
       <div class="react-button" [style.color]="getReactColor(item)">
         <button mat-icon-button [matMenuTriggerFor]="reactMenu" class="noprop">
-            <mat-icon>thumb_up</mat-icon>
+            <mat-icon class="noprop">thumb_up</mat-icon>
         </button>
       </div>
 

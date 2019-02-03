@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, HostListener } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Title } from '@angular/platform-browser';
 import { DataService } from './data.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { Helpers } from './helpers';
@@ -51,6 +50,12 @@ export class AppComponent implements OnDestroy, OnInit {
       this.isSandbox = true;
       this.dataService.isSandbox = true;
     }
+
+    /* Check if sessionid is passed as a query parameter */
+    const sessid = Helpers.getParameterByName('sessionid');
+    if (sessid) {
+      document.cookie = `sessionid=${sessid}; path=/`;
+    }
   }
 
   private toggleSidebar() {
@@ -68,7 +73,7 @@ export class AppComponent implements OnDestroy, OnInit {
     if (environment.production) {
       if (!this.isSandbox) {
         /* Show a prompt to update */
-        this.swUpdate.available.subscribe(event => {
+        this.swUpdate.available.subscribe(() => {
           const snackBarRef = this.snackBar.open('New version available!', 'Refresh', {
             duration: 60000,
           });
@@ -84,9 +89,9 @@ export class AppComponent implements OnDestroy, OnInit {
     }
 
     /** Get user (try) */
-    this.dataService.GetFillCurrentUser().subscribe(user => {
+    this.dataService.GetFillCurrentUser().subscribe(() => {
       this.dataService.setInitialized();
-    }, (error) => {
+    }, () => {
       this.dataService.setInitialized();
     });
 
